@@ -1,0 +1,22 @@
+{
+  "name": "first",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Manzanit0/Microverse-Node-Course.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Manzanit0/Microverse-Node-Course/issues"
+  },
+  "homepage": "https://github.com/Manzanit0/Microverse-Node-Course#readme",
+  "dependencies": {
+    "express": "^4.15.2"
+  }
+}

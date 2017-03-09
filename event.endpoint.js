@@ -57,4 +57,4 @@ module.exports = router;
  Delete /event/id -> Borrar evento
  Delete /event -> Borrar todos evento
 
- *//
+ */

@@ -1,3 +1,11 @@
+
+const event = {id:0, title:'', descripcion:'', fecha:'24/02/1993'};
+
+const eventArray = [];
+
+eventArray.push({id:12345, title:'Un evento', descripcion:'asñkdlfhasdkfjh', fecha:'12/01/1998'});
+eventArray.push({id:98663, title:'Otro evento', descripcion:'qwerty', fecha:'01/02/2001'});
+
 /**
  * Import express library
  */
@@ -11,23 +19,9 @@ const app = express();
 /**
  * Create GET handler
  */
-app.get('/test', (req, res, next) => res.send('GET request on /test'));
-
-/**
- * Create POST handler
- */
-app.post('/ping', (req, res) => res.send('Post request on /ping'));
-
-app.route('/book')
-  .get(function (req, res) {
-    res.send('Get a random book')
-  })
-  .post(function (req, res) {
-    res.send('Add a book')
-  })
-  .put(function (req, res) {
-    res.send('Update the book')
-  });
+ app.get('/event', function (req, res) {
+   res.json(eventArray);
+ });
 
 /**
  *  Start server

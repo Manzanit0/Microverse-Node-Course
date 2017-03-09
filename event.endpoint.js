@@ -39,8 +39,67 @@ const getEventById = (req, res, next) => {
     }
 };
 
+const postEvent = (req, res, next) => {
+
+    console.log(req.body);
+
+    if(req.body.id){
+      eventArray.push(req.body);
+      res.status(201).json({result: 'Perfect creation!', code: 201, data: req.body});
+    }
+    else{
+      res.status(422).json({result: 'Dude, that didnt have an id!', code: 422, data: {}});
+    }
+}
+
+const updateEvent = (req, res, next) => {
+  let found = false;
+
+  if (req.params.id) {
+      for (let i = 0; eventArray.length > i; i++) {
+          if (eventArray[i].id == req.params.id) {
+              found = true;
+              eventArray[i] = req.body;
+          }
+      }
+
+      if (found) {
+          res.status(200).json({result: 'ok', code: 200, data:req.body});
+      } else {
+          res.status(204).json();
+      }
+  } else {
+      res.status(422).json({result: 'error', code: 422, data: { msg: 'Unprocessable Entity'}});
+  }
+}
+
+const deleteEvent = (req, res, next) => {
+  let found = false;
+
+  if (req.params.id) {
+      for (let i = 0; eventArray.length > i; i++) {
+          if (eventArray[i].id == req.params.id) {
+              found = true;
+              //delete eventArray[i];
+              eventArray.splice(i, 1);
+          }
+      }
+
+      if (found) {
+          res.status(200).json({result: 'ok', code: 200, data: { msg: 'delete succesful'}});
+      } else {
+          res.status(204).json();
+      }
+  } else {
+      res.status(422).json({result: 'error', code: 422, data: { msg: 'Unprocessable Entity'}});
+  }
+}
+
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
+router.post('/', postEvent);
+router.put('/:id', updateEvent);
+router.delete('/:id', deleteEvent);
 
 module.exports = router;
 

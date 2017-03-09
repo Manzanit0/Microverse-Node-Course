@@ -4,6 +4,7 @@
  * Import express library
  */
 const express = require('express');
+const bodyParser = require('body-parser'); // Librería requerida para parsear jsons.
 
 //const routes = require('./routes');
 
@@ -11,6 +12,9 @@ const express = require('express');
  * Create express app
  */
 const app = express();
+// Ahora aplicamos la librería...
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 require('./routes.js')(app);
 

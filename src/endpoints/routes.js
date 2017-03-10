@@ -1,9 +1,14 @@
 'use strict';
 
+/**
+ * Load express library
+ */
 const express = require('express');
 
-const event = require('./event.endpoint');
-
+/**
+ * Load enpoints files
+ */
+const event = require('./event.endpoint.js');
 
 /**
  * API Endpoints defined for REST

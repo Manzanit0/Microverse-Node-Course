@@ -19,6 +19,9 @@
 const express = require('express'),
     router = express.Router();
 
+/**
+ * Import event model
+ */
 const events = require('../models/event.model');
 
 /**

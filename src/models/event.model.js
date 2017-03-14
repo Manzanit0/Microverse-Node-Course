@@ -8,4 +8,7 @@ const events = [
     {id: 98663, title: 'Otro evento', descripcion: 'qwerty', fecha: '01/02/2001'}
 ];
 
+/**
+ * Export event model
+ */
 module.exports = events;

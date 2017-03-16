@@ -53,9 +53,6 @@ const getAllEvents = (req, res) => {
 const getEventById = (req, res) => {
     const id = req.params.id;
 
-    let found = false;
-    let result;
-
     if (id) {
         Event.findById()
             .then(event => {

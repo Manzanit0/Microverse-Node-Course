@@ -17,12 +17,14 @@
  * Load express libraries
  */
 const express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    mongoose = require('mongoose');
 
 /**
  * Import event model
  */
 const eventSchema = require('../models/event.model');
+
 const Event = mongoose.model('Event', eventSchema);
 
 /**
@@ -54,7 +56,31 @@ const getEventById = (req, res) => {
     const id = req.params.id;
 
     if (id) {
-        Event.findById()
+        Event.findById(id)
+            .then(event => {
+                if (event !== null) {
+                    res.status(200).json({result: 'ok', code: 200, data: event});
+                } else {
+                    res.status(204).json();
+                }
+            })
+            .catch(err => res.status(500).json({result: 'error', code: 500, data: {}}));
+    } else {
+        res.status(422).json({result: 'error', code: 422, data: {msg: 'Unprocessable Entity'}});
+    }
+};
+
+/**
+ * Retrieve one event by title
+ *
+ * @param req
+ * @param res
+ */
+const getEventByTitle = (req, res) => {
+    const title = req.params.title;
+    console.log(title);
+    if (title) {
+        Event.find({title: title})
             .then(event => {
                 if (event !== null) {
                     res.status(200).json({result: 'ok', code: 200, data: event});
@@ -75,9 +101,18 @@ const getEventById = (req, res) => {
  * @param res
  */
 const postEvent = (req, res) => {
-    if (req.body.id) {
-        events.push(req.body);
-        res.status(201).json({result: 'ok', code: 201, data: req.body});
+    if (req.body) {
+        // Creamos un evento con el esquema que hemos hecho para poder guardarlo en la BD.
+        let event = new Event(req.body);
+
+        event.save()
+            .then(event => {
+                console.log(event);
+                res.status(201).json({result: 'ok', code: 201, data: req.body});
+            })
+            .catch(error => {
+                res.status(500).json({result: 'error', code: 500, data: {msg: error}});
+            });
     }
     else {
         res.status(422).json({result: 'error', code: 422, data: {msg: 'Unprocessable Entity'}});
@@ -91,21 +126,18 @@ const postEvent = (req, res) => {
  * @param res
  */
 const updateEvent = (req, res) => {
-    let found = false;
+    const id = req.params.id;
 
-    if (req.params.id) {
-        for (let i = 0; events.length > i; i++) {
-            if (events[i].id == req.params.id) {
-                found = true;
-                events[i] = req.body;
-            }
-        }
-
-        if (found) {
-            res.status(200).json({result: 'ok', code: 200, data: req.body});
-        } else {
-            res.status(204).json();
-        }
+    if (id) {
+        Event.findByIdAndUpdate(id, req.body, {new:true}) //el new:true hace que me devuelva el nuevo.
+            .then(event => {
+                if (event !== null) {
+                    res.status(200).json({result: 'ok', code: 200, data: event});
+                } else {
+                    res.status(204).json();
+                }
+            })
+            .catch(err => res.status(500).json({result: 'error', code: 500, data: {}}));
     } else {
         res.status(422).json({result: 'error', code: 422, data: {msg: 'Unprocessable Entity'}});
     }
@@ -118,21 +150,18 @@ const updateEvent = (req, res) => {
  * @param res
  */
 const deleteEvent = (req, res) => {
-    let found = false;
+    const id = req.params.id;
 
-    if (req.params.id) {
-        for (let i = 0; events.length > i; i++) {
-            if (events[i].id == req.params.id) {
-                found = true;
-                eventArray.splice(i, 1);
-            }
-        }
-
-        if (found) {
-            res.status(200).json({result: 'ok', code: 200, data: {msg: 'delete succesful'}});
-        } else {
-            res.status(204).json();
-        }
+    if (id) {
+        Event.findByIdAndRemove(id, req.body)
+            .then(event => {
+                if (event !== null) {
+                    res.status(200).json({result: 'ok', code: 200, data: event});
+                } else {
+                    res.status(204).json();
+                }
+            })
+            .catch(err => res.status(500).json({result: 'error', code: 500, data: {}}));
     } else {
         res.status(422).json({result: 'error', code: 422, data: {msg: 'Unprocessable Entity'}});
     }
@@ -140,6 +169,7 @@ const deleteEvent = (req, res) => {
 
 router.get('/', getAllEvents);
 router.get('/:id', getEventById);
+router.get('/title/:title', getEventByTitle);
 router.post('/', postEvent);
 router.put('/:id', updateEvent);
 router.delete('/:id', deleteEvent);

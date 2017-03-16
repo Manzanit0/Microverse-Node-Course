@@ -34,11 +34,14 @@ const Event = mongoose.model('Event', eventSchema);
 const getAllEvents = (req, res) => {
     // Recuperar eventos.
     Event.find()
-    if (events.length > 0) {
-        res.status(200).json({result: 'ok', code: 200, data: events});
-    } else {
-        res.status(204).json();
-    }
+        .then(events => {
+            if (events.length > 0) {
+                res.status(200).json({result: 'ok', code: 200, data: events});
+            } else {
+                res.status(204).json();
+            }
+        })
+        .catch(err => res.status(500).json({result: 'error', code: 500, data: {}}));
 };
 
 /**
@@ -54,18 +57,15 @@ const getEventById = (req, res) => {
     let result;
 
     if (id) {
-        for (let i = 0; events.length > i; i++) {
-            if (events[i].id == id) {
-                found = true;
-                result = events[i];
-            }
-        }
-
-        if (found) {
-            res.status(200).json({result: 'ok', code: 200, data: result});
-        } else {
-            res.status(204).json();
-        }
+        Event.findById()
+            .then(event => {
+                if (event !== null) {
+                    res.status(200).json({result: 'ok', code: 200, data: event});
+                } else {
+                    res.status(204).json();
+                }
+            })
+            .catch(err => res.status(500).json({result: 'error', code: 500, data: {}}));
     } else {
         res.status(422).json({result: 'error', code: 422, data: {msg: 'Unprocessable Entity'}});
     }

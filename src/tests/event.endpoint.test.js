@@ -1,19 +1,29 @@
 require('../app.js');
 
 const assert = require('assert'),
-chai = require('chai'),
-chaiHttp = require('chai-http');
+        chai = require('chai'),
+    chaiHttp = require('chai-http'),
+        util = require('util'); // What's the point of Util?
 
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-const util = require('util');
-
 describe('Event API endpoint', () => {
+
+    //TODO: ¿Esto debería tomarse del db.config.js?
+    const serverUrl = 'http://localhost:3000';
+
+    before( () => {
+        //TODO: Inserción de datos de test en la BD.
+    });
+
+    after( () => {
+        //TODO: borrado de los datos de test en la BD.
+    });
 
     describe('GET all events', () => {
         it('GET all event should have a 200 status', (done) => { // <= Pass in done callback
-            chai.request('http://localhost:3000')
+            chai.request('serverUrl')
                 .get('/event')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -22,7 +32,7 @@ describe('Event API endpoint', () => {
         });
 
         it('GET all event should have expected structure', (done) => { // <= Pass in done callback
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .get('/event')
                 .end((err, res) => {
                     expect(res.body.result).to.equal('ok');
@@ -35,7 +45,7 @@ describe('Event API endpoint', () => {
 
     describe('GET event by Id', () => {
         it('GET event by Id should have a 200 status', (done) => {
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .get('/event/12345')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -44,7 +54,7 @@ describe('Event API endpoint', () => {
         });
 
         it('GET event by wrong Id should not have a 200 status', (done) => {
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .get('/event/666')
                 .end((err, res) => {
                     expect(res).to.not.have.status(200);
@@ -53,7 +63,7 @@ describe('Event API endpoint', () => {
         });
 
         it('GET event by Id should be a single event', (done) => {
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .get('/event/12345')
                 .end((err, res) => {
                     expect(res).to.be.an('object');
@@ -65,7 +75,7 @@ describe('Event API endpoint', () => {
 
     describe('POST event', () => {
         it('POST event receives an 201 status', (done) => {
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .post('/event')
                 .send({id: 987654321, title: 'ola k ase', descripcion: 'pir pir pir', fecha: '12/01/3078'})
                 .end((err, res) => {
@@ -76,7 +86,7 @@ describe('Event API endpoint', () => {
 
         it('POST event return value is the same as the sent', (done) => {
             const sentData = {id: 987654321, title: 'ola k ase', descripcion: 'pir pir pir', fecha: '12/01/3078'};
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .post('/event')
                 .send(sentData)
                 .end((err, res) => {
@@ -89,8 +99,8 @@ describe('Event API endpoint', () => {
 
     describe('PUT event by Id', () => {
         it('PUT event receives an 201 status', (done) => {
-            chai.request('http://localhost:3000')
-                .post('/event')
+            chai.request(serverUrl)
+                .put('/event/12345')
                 .send({id: 987654321, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'})
                 .end((err, res) => {
                     expect(res).to.have.status(201);
@@ -100,11 +110,11 @@ describe('Event API endpoint', () => {
 
         it('PUT event updates the object and its not equals', (done) => {
             const sentData = {id: 12345, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'};
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
             .post('/event')
             .send(sentData)
             .end((err, res) => {
-                chai.request('http://localhost:3000')
+                chai.request(serverUrl)
                     .put('/event/12345')
                     .send({id: 12345, title: 'titulo cambiado', descripcion: '', fecha: '01/11/1234'})
                     .end((err, res) => {
@@ -117,7 +127,7 @@ describe('Event API endpoint', () => {
 
     describe('DELETE event by Id', () => {
         it('DELETE event receives an 200 status', (done) => {
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .delete('/event/12345')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -126,7 +136,7 @@ describe('Event API endpoint', () => {
         });
 
         it('The deleted event does no longer exist. Status = 204', (done) => {
-            chai.request('http://localhost:3000')
+            chai.request(serverUrl)
                 .delete('/event/12345')
                 .end((err, res) => {
                     expect(res).to.have.status(204);

@@ -22,7 +22,8 @@ const express = require('express'),
 /**
  * Import event model
  */
-const events = require('../models/event.model');
+const eventSchema = require('../models/event.model');
+const Event = mongoose.model('Event', eventSchema);
 
 /**
  * Retrieve all events
@@ -31,6 +32,8 @@ const events = require('../models/event.model');
  * @param res
  */
 const getAllEvents = (req, res) => {
+    // Recuperar eventos.
+    Event.find()
     if (events.length > 0) {
         res.status(200).json({result: 'ok', code: 200, data: events});
     } else {

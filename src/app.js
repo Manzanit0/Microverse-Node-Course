@@ -21,7 +21,7 @@ const app = express();
 /**
  * Database connection handler
  */
-mongoose.connect('mongodb://172.21.0.5:27017/microverse');
+mongoose.connect(db.url);
 
 /**
  * Apply libraries over our app

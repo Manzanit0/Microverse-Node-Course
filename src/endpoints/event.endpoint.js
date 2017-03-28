@@ -124,7 +124,7 @@ const deleteEvent = (req, res) => {
         for (let i = 0; events.length > i; i++) {
             if (events[i].id == req.params.id) {
                 found = true;
-                eventArray.splice(i, 1);
+                events.splice(i, 1);
             }
         }
 

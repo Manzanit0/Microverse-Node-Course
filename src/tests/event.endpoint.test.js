@@ -1,12 +1,21 @@
-require('../app.js');
+//require('../app.js');
 
 const assert = require('assert'),
         chai = require('chai'),
     chaiHttp = require('chai-http'),
-        util = require('util'); // What's the point of Util?
+    mongoose = require('mongoose');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
+
+/**
+ * Import event model
+ */
+const eventSchema = require('../models/event.model');
+const Event = mongoose.model('Event', eventSchema);
+
+// Use native promises
+mongoose.Promise = global.Promise;
 
 describe('Event API endpoint', () => {
 
@@ -14,7 +23,20 @@ describe('Event API endpoint', () => {
     const serverUrl = 'http://localhost:3000';
 
     before( () => {
-        //TODO: Inserción de datos de test en la BD.
+        let event = new Event({
+          title: 'title',
+          description: 'description',
+          date: '01/01/1990',
+        });
+
+            console.log('hila');
+        event.save()
+            .then(result =>{
+                console.log(result.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     });
 
     after( () => {
@@ -37,6 +59,7 @@ describe('Event API endpoint', () => {
                 .end((err, res) => {
                     expect(res.body.result).to.equal('ok');
                     expect(res.body.code).to.equal(200);
+                    expect(res).to.have.status(200);
                     expect(res.body).to.have.property('data');
                     done();
             });
@@ -46,7 +69,7 @@ describe('Event API endpoint', () => {
     describe('GET event by Id', () => {
         it('GET event by Id should have a 200 status', (done) => {
             chai.request(serverUrl)
-                .get('/event/12345')
+                .get('/event/58daa94844e08d183e0ef5a6')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -100,10 +123,10 @@ describe('Event API endpoint', () => {
     describe('PUT event by Id', () => {
         it('PUT event receives an 201 status', (done) => {
             chai.request(serverUrl)
-                .put('/event/12345')
+                .put('/event/58daa94844e08d183e0ef5a6')
                 .send({id: 987654321, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'})
                 .end((err, res) => {
-                    expect(res).to.have.status(201);
+                    expect(res).to.have.status(200);
                     done();
             });
         });
@@ -128,7 +151,7 @@ describe('Event API endpoint', () => {
     describe('DELETE event by Id', () => {
         it('DELETE event receives an 200 status', (done) => {
             chai.request(serverUrl)
-                .delete('/event/12345')
+                .delete('/event/58daa94844e08d183e0ef5a6')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -137,7 +160,7 @@ describe('Event API endpoint', () => {
 
         it('The deleted event does no longer exist. Status = 204', (done) => {
             chai.request(serverUrl)
-                .delete('/event/12345')
+                .delete('/event/58daa94844e08d183e0ef5a6')
                 .end((err, res) => {
                     expect(res).to.have.status(204);
                     done();

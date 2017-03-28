@@ -7,6 +7,9 @@ const express = require('express'),
     mongoose = require('mongoose'),
     bodyParser = require('body-parser'); //Parse JSON in body request
 
+// Use native promises
+mongoose.Promise = global.Promise;
+
 /**
  * Load files
  */

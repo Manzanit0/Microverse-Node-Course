@@ -37,7 +37,7 @@ const getAllEvents = (req, res) => {
     // Recuperar eventos.
     Event.find()
         .then(events => {
-            if (events.length > 0) {
+            if (events.length > 0) { console.log(events);
                 res.status(200).json({result: 'ok', code: 200, data: events});
             } else {
                 res.status(204).json();

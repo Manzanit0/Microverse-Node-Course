@@ -37,7 +37,7 @@ const getAllEvents = (req, res) => {
     // Recuperar eventos.
     Event.find()
         .then(events => {
-            if (events.length > 0) { console.log(events);
+            if (events.length > 0) {
                 res.status(200).json({result: 'ok', code: 200, data: events});
             } else {
                 res.status(204).json();
@@ -78,7 +78,6 @@ const getEventById = (req, res) => {
  */
 const getEventByTitle = (req, res) => {
     const title = req.params.title;
-    console.log(title);
     if (title) {
         Event.find({title: title})
             .then(event => {
@@ -107,7 +106,6 @@ const postEvent = (req, res) => {
 
         event.save()
             .then(event => {
-                console.log(event);
                 res.status(201).json({result: 'ok', code: 201, data: req.body});
             })
             .catch(error => {

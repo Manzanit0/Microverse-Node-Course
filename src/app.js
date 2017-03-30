@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * Import express library
- */
+* Import libraries
+*/
 const express = require('express'),
     mongoose = require('mongoose'),
     bodyParser = require('body-parser'); //Parse JSON in body request
@@ -11,37 +11,45 @@ const express = require('express'),
 mongoose.Promise = global.Promise;
 
 /**
- * Load files
- */
+* Load files
+*/
 const config = require('./config/server.config'),
-    db = require('./config/server.config');
+    db = require('./config/db.config');
 
 /**
- * Create express app
- */
+* Create express app
+*/
 const app = express();
 
 /**
- * Database connection handler
- */
-mongoose.connect(db.url);
+* Database connection handler
+*/
+mongoose.connect(db.mongoURI[app.settings.env], function(err, res) {
+    if(err) {
+        console.log('Error connecting to the database. ' + err);
+    } else {
+        console.log('Connected to Database: ' + db.mongoURI[app.settings.env]);
+    }
+});
 
 /**
- * Apply libraries over our app
- */
+* Apply libraries over our app
+*/
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 /**
- * Require route file wit app
- */
+* Require route file wit app
+*/
 require('./endpoints/routes.js')(app);
 
 /**
- *  Start server
- */
+*  Start server
+*/
 app.listen(config.port, () => console.log('Example app listening on port ' + config.port + '!'));
 
 setTimeout(() => {
     console.log('mongoose connection state: ' + mongoose.connection.readyState);
 }, 5000);
+
+module.exports =app;

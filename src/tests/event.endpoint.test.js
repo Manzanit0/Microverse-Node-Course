@@ -1,10 +1,23 @@
-//require('../app.js');
+/**
+ * Change to testing enviroment.
+ */
+process.env.NODE_ENV = 'test';
 
+const server = require('../app.js'),
+    eventModel = require('../models/event.model.js'),
+    db = require('../config/db.config.js');
+
+/**
+ * libraries
+ */
 const assert = require('assert'),
         chai = require('chai'),
     chaiHttp = require('chai-http'),
     mongoose = require('mongoose');
 
+/**
+ * Setup chai
+ */
 const expect = chai.expect;
 chai.use(chaiHttp);
 
@@ -14,28 +27,28 @@ chai.use(chaiHttp);
 const eventSchema = require('../models/event.model');
 const Event = mongoose.model('Event', eventSchema);
 
-// Use native promises
-mongoose.Promise = global.Promise;
 
 describe('Event API endpoint', () => {
 
-    //TODO: ¿Esto debería tomarse del db.config.js?
-    const serverUrl = 'http://localhost:3000';
+    // Empty DB.
+    Event.collection.drop();
+
+    let id = '';
 
     before( () => {
-        let event = new Event({
-          title: 'title',
-          description: 'description',
+        let newEvent = new Event({
+          title: 'test event',
+          description: 'test description',
           date: '01/01/1990',
         });
 
-            console.log('hila');
-        event.save()
+        console.log('Before saving');
+        newEvent.save()
             .then(result =>{
-                console.log(result.data);
+                id = result._id;
             })
             .catch(error => {
-                console.log(error);
+
             });
     });
 
@@ -45,7 +58,7 @@ describe('Event API endpoint', () => {
 
     describe('GET all events', () => {
         it('GET all event should have a 200 status', (done) => { // <= Pass in done callback
-            chai.request('serverUrl')
+            chai.request(server)
                 .get('/event')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -54,7 +67,7 @@ describe('Event API endpoint', () => {
         });
 
         it('GET all event should have expected structure', (done) => { // <= Pass in done callback
-            chai.request(serverUrl)
+            chai.request(server)
                 .get('/event')
                 .end((err, res) => {
                     expect(res.body.result).to.equal('ok');
@@ -68,8 +81,8 @@ describe('Event API endpoint', () => {
 
     describe('GET event by Id', () => {
         it('GET event by Id should have a 200 status', (done) => {
-            chai.request(serverUrl)
-                .get('/event/58daa94844e08d183e0ef5a6')
+            chai.request(server)
+                .get('/event/'+id)
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -77,17 +90,17 @@ describe('Event API endpoint', () => {
         });
 
         it('GET event by wrong Id should not have a 200 status', (done) => {
-            chai.request(serverUrl)
+            chai.request(server)
                 .get('/event/666')
                 .end((err, res) => {
-                    expect(res).to.not.have.status(200);
+                    expect(res).to.not.have.status(204);
                     done();
             });
         });
 
         it('GET event by Id should be a single event', (done) => {
-            chai.request(serverUrl)
-                .get('/event/12345')
+            chai.request(server)
+                .get('/event/'+id)
                 .end((err, res) => {
                     expect(res).to.be.an('object');
                     done();
@@ -98,7 +111,7 @@ describe('Event API endpoint', () => {
 
     describe('POST event', () => {
         it('POST event receives an 201 status', (done) => {
-            chai.request(serverUrl)
+            chai.request(server)
                 .post('/event')
                 .send({id: 987654321, title: 'ola k ase', descripcion: 'pir pir pir', fecha: '12/01/3078'})
                 .end((err, res) => {
@@ -109,7 +122,7 @@ describe('Event API endpoint', () => {
 
         it('POST event return value is the same as the sent', (done) => {
             const sentData = {id: 987654321, title: 'ola k ase', descripcion: 'pir pir pir', fecha: '12/01/3078'};
-            chai.request(serverUrl)
+            chai.request(server)
                 .post('/event')
                 .send(sentData)
                 .end((err, res) => {
@@ -122,8 +135,8 @@ describe('Event API endpoint', () => {
 
     describe('PUT event by Id', () => {
         it('PUT event receives an 201 status', (done) => {
-            chai.request(serverUrl)
-                .put('/event/58daa94844e08d183e0ef5a6')
+            chai.request(server)
+                .put('/event/'+id)
                 .send({id: 987654321, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'})
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -133,12 +146,12 @@ describe('Event API endpoint', () => {
 
         it('PUT event updates the object and its not equals', (done) => {
             const sentData = {id: 12345, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'};
-            chai.request(serverUrl)
+            chai.request(server)
             .post('/event')
             .send(sentData)
             .end((err, res) => {
-                chai.request(serverUrl)
-                    .put('/event/12345')
+                chai.request(server)
+                    .put('/event/'+id)
                     .send({id: 12345, title: 'titulo cambiado', descripcion: '', fecha: '01/11/1234'})
                     .end((err, res) => {
                         expect(res.body.data).to.not.deep.equals(sentData);
@@ -150,8 +163,8 @@ describe('Event API endpoint', () => {
 
     describe('DELETE event by Id', () => {
         it('DELETE event receives an 200 status', (done) => {
-            chai.request(serverUrl)
-                .delete('/event/58daa94844e08d183e0ef5a6')
+            chai.request(server)
+                .delete('/event/'+id)
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -159,8 +172,8 @@ describe('Event API endpoint', () => {
         });
 
         it('The deleted event does no longer exist. Status = 204', (done) => {
-            chai.request(serverUrl)
-                .delete('/event/58daa94844e08d183e0ef5a6')
+            chai.request(server)
+                .delete('/event/'+id)
                 .end((err, res) => {
                     expect(res).to.have.status(204);
                     done();

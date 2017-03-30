@@ -43,5 +43,5 @@ require('./endpoints/routes.js')(app);
 app.listen(config.port, () => console.log('Example app listening on port ' + config.port + '!'));
 
 setTimeout(() => {
-    console.log(mongoose.connection.readyState);
+    console.log('mongoose connection state: ' + mongoose.connection.readyState);
 }, 5000);

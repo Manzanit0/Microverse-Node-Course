@@ -18,6 +18,7 @@
  */
 const express = require('express'),
     router = express.Router(),
+    passport = require('passport'),
     mongoose = require('mongoose');
 
 /**
@@ -165,7 +166,7 @@ const deleteEvent = (req, res) => {
     }
 };
 
-router.get('/', getAllEvents);
+router.get('/', passport.authenticate('basic', { session: false }), getAllEvents);
 router.get('/:id', getEventById);
 router.get('/title/:title', getEventByTitle);
 router.post('/', postEvent);

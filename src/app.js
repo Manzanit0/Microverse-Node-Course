@@ -44,13 +44,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 /**
-* Authentication 
+* Authentication
 */
 passport.use(new Strategy(
   	function(username, password, cb) {
   			User.findOne({ username: username })
   			.then(user => {
   					if (!user) { return cb(null, false); }
+                        //TODO: implement some MD5 or SHA encryption.
 						if (user.password !== password) { return cb(null, false); }
       			return cb(null, user);
         })

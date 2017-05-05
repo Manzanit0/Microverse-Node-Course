@@ -18,6 +18,7 @@
  */
 const express = require('express'),
     router = express.Router(),
+    passport = require('passport'),
     mongoose = require('mongoose');
 
 /**
@@ -171,5 +172,8 @@ router.get('/title/:title', getEventByTitle);
 router.post('/', postEvent);
 router.put('/:id', updateEvent);
 router.delete('/:id', deleteEvent);
+
+// Add authoritation to every endpoint.
+router.all('*', passport.authenticate('basic', { session: false }));
 
 module.exports = router;

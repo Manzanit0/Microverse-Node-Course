@@ -27,11 +27,29 @@ chai.use(chaiHttp);
 const eventSchema = require('../models/event.model');
 const Event = mongoose.model('Event', eventSchema);
 
+const userSchema = require('../models/user.model');
+const User = mongoose.model('user', userSchema);
+
 
 describe('Event API endpoint', () => {
 
     // Insert an event record before the tests.
-    before( () => {
+    before( (done) => {
+
+        let newUser = new User({
+          username: 'user',
+          password: 'pass',
+          email: 'test@email.net',
+        });
+
+        newUser.save()
+            .then(result => {
+                id = result.id;
+            })
+            .catch(error => {
+                console.log(error);
+            });
+
         let newEvent = new Event({
           title: 'test event',
           description: 'test description',
@@ -45,10 +63,12 @@ describe('Event API endpoint', () => {
             .catch(error => {
                 console.log(error);
             });
+
+            done();
     });
 
     // Empty the DB event table once tests are over.
-    after(function(done){
+    after((done) => {
       Event.collection.drop();
       done();
     });
@@ -56,7 +76,8 @@ describe('Event API endpoint', () => {
     describe('POST event', () => {
         it('POST event receives an 201 status', (done) => {
             chai.request(server)
-                .post('/event')
+                .post('/events')
+                .auth('user', 'pass')
                 .send({id: 987654321, title: 'ola k ase', descripcion: 'pir pir pir', fecha: '12/01/3078'})
                 .end((err, res) => {
                     expect(res).to.have.status(201);
@@ -67,7 +88,8 @@ describe('Event API endpoint', () => {
         it('POST event return value is the same as the sent', (done) => {
             const sentData = {id: 987654321, title: 'ola k ase', descripcion: 'pir pir pir', fecha: '12/01/3078'};
             chai.request(server)
-                .post('/event')
+                .post('/events')
+                .auth('user', 'pass')
                 .send(sentData)
                 .end((err, res) => {
                     expect(res.body.data).to.deep.equals(sentData);
@@ -80,7 +102,8 @@ describe('Event API endpoint', () => {
     describe('PUT event by Id', () => {
         it('PUT event receives an 201 status', (done) => {
             chai.request(server)
-                .put('/event/'+id)
+                .put('/events/'+id)
+                .auth('user', 'pass')
                 .send({id: 987654321, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'})
                 .end((err, res) => {
                     expect(res).to.have.status(200);
@@ -91,11 +114,12 @@ describe('Event API endpoint', () => {
         it('PUT event updates the object and its not equals', (done) => {
             const sentData = {id: 12345, title: 'ola k ase 2', descripcion: '', fecha: '01/11/1234'};
             chai.request(server)
-            .post('/event')
+            .post('/events')
+            .auth('user', 'pass')
             .send(sentData)
             .end((err, res) => {
                 chai.request(server)
-                    .put('/event/'+id)
+                    .put('/events/'+id)
                     .send({id: 12345, title: 'titulo cambiado', descripcion: '', fecha: '01/11/1234'})
                     .end((err, res) => {
                         expect(res.body.data).to.not.deep.equals(sentData);
@@ -108,7 +132,8 @@ describe('Event API endpoint', () => {
     describe('GET all events', () => {
         it('GET all event should have a 200 status', (done) => { // <= Pass in done callback
             chai.request(server)
-                .get('/event')
+                .get('/events')
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -117,7 +142,8 @@ describe('Event API endpoint', () => {
 
         it('GET all event should have expected structure', (done) => { // <= Pass in done callback
             chai.request(server)
-                .get('/event')
+                .get('/events')
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res.body.result).to.equal('ok');
                     expect(res.body.code).to.equal(200);
@@ -131,7 +157,8 @@ describe('Event API endpoint', () => {
     describe('GET event by Id', () => {
         it('GET event by Id should have a 200 status', (done) => {
             chai.request(server)
-                .get('/event/'+id)
+                .get('/events/'+id)
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -140,7 +167,8 @@ describe('Event API endpoint', () => {
 
         it('GET event by wrong Id should not have a 200 status', (done) => {
             chai.request(server)
-                .get('/event/666')
+                .get('/events/666')
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res).to.not.have.status(204);
                     done();
@@ -149,7 +177,8 @@ describe('Event API endpoint', () => {
 
         it('GET event by Id should be a single event', (done) => {
             chai.request(server)
-                .get('/event/'+id)
+                .get('/events/'+id)
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res).to.be.an('object');
                     done();
@@ -161,7 +190,8 @@ describe('Event API endpoint', () => {
     describe('DELETE event by Id', () => {
         it('DELETE event receives an 200 status', (done) => {
             chai.request(server)
-                .delete('/event/'+id)
+                .delete('/events/'+id)
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res).to.have.status(200);
                     done();
@@ -170,7 +200,8 @@ describe('Event API endpoint', () => {
 
         it('The deleted event does no longer exist. Status = 204', (done) => {
             chai.request(server)
-                .delete('/event/'+id)
+                .delete('/events/'+id)
+                .auth('user', 'pass')
                 .end((err, res) => {
                     expect(res).to.have.status(204);
                     done();

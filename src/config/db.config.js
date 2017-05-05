@@ -6,7 +6,7 @@
 const config = {};
 
 config.mongoURI = {
-    dev: 'mongodb://localhost:27017/microverse',
+    development: 'mongodb://localhost:27017/microverse',
     test: 'mongodb://localhost:27017/test'
 };
 

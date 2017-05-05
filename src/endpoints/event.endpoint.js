@@ -166,11 +166,14 @@ const deleteEvent = (req, res) => {
     }
 };
 
-router.get('/', passport.authenticate('basic', { session: false }), getAllEvents);
-router.get('/:id', passport.authenticate('basic', { session: false }), getEventById);
-router.get('/title/:title', passport.authenticate('basic', { session: false }), getEventByTitle);
-router.post('/', passport.authenticate('basic', { session: false }), postEvent);
-router.put('/:id', passport.authenticate('basic', { session: false }), updateEvent);
-router.delete('/:id', passport.authenticate('basic', { session: false }), deleteEvent);
+router.get('/', getAllEvents);
+router.get('/:id', getEventById);
+router.get('/title/:title', getEventByTitle);
+router.post('/', postEvent);
+router.put('/:id', updateEvent);
+router.delete('/:id', deleteEvent);
+
+// Add authoritation to every endpoint.
+router.all('*', passport.authenticate('basic', { session: false }));
 
 module.exports = router;
